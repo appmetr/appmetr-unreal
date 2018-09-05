@@ -1,0 +1,29 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "AppMetr",
+	"Description": "AppMetr Integration Plugin",
+	"Category": "Analytics",
+	"CreatedBy": "AppMetr",
+	"CreatedByURL": "https://appmetr.com",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "AppMetr",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+            "WhitelistPlatforms" : [ "Android", "Mac", "Win32", "Win64" ]
+		},
+        {
+            "Name" : "AppMetrEditor",
+            "Type" : "Developer",
+            "LoadingPhase" : "PreDefault"
+        }
+	]
+}

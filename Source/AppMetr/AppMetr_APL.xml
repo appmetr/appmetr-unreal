@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--AppMetr plugin additions-->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- init section is always evaluated once per architecture -->
+    <init>
+        <log text="AppMetr init"/>
+    </init>
+
+    <!-- optional updates applied to AndroidManifest.xml -->
+    <androidManifestUpdates>
+        <!-- Read AppMetrKey from plugin project settings and add to the manifest -->
+        <setStringFromProperty result="AppMetrKey" ini="Engine" section="/Script/AppMetrEditor.AppMetrProjectSettings" property="AppMetrKey" default=""/>
+        <setElement result="AppMetrKeyMetadata" value="meta-data"/>
+        <addAttribute tag="$AppMetrKeyMetadata" name="android:name" value="com.epicgames.ue4.AppMetr.AppMetrKey"/>
+        <addAttribute tag="$AppMetrKeyMetadata" name="android:value" value="\ $S(AppMetrKey)"/>
+        <addElement tag="application" name="AppMetrKeyMetadata"/>
+
+        <addPermission android:name="android.permission.INTERNET"/>
+        <addPermission android:name="android.permission.ACCESS_WIFI_STATE"/>
+        <addPermission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+        <addPermission android:name="android.permission.READ_PHONE_STATE"/>
+    </androidManifestUpdates>
+
+    <!-- optional additions to proguard -->
+    <proguardAdditions>
+        <insert>
+-keep class com.appmetr.android.** { *; }
+-keep class android.net.** { *; }
+-dontwarn android.net.**
+        </insert>
+    </proguardAdditions>
+
+    <!-- optional files or directories to copy to Intermediate/Android/APK -->
+    <resourceCopies>
+        <copyFile src="$S(PluginDir)/../../Build/Android/libs/appmetr-android-1.9.21.jar" dst="$S(BuildDir)/libs/appmetr-android-1.9.21.jar" />
+    </resourceCopies>
+
+    <!-- optional additions to the GameActivity imports in GameActivity.java -->
+    <gameActivityImportAdditions>
+        <insert><![CDATA[
+import com.appmetr.android.AppMetr;
+import com.appmetr.android.AppMetrListener;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.util.zip.DataFormatException;
+        ]]></insert>
+    </gameActivityImportAdditions>
+
+    <!-- optional additions to the GameActivity class in GameActivity.java -->
+    <gameActivityClassAdditions>
+        <insert><![CDATA[
+            private static String AppMetrKey;
+
+            private void initializeAppMetr() throws DataFormatException {
+                AppMetr.setup(AppMetrKey, this);
+            }
+
+            public void AndroidThunkJava_AppMetr_attachProperties(String properties) {
+                try {
+                    JSONObject propertiesObject = new JSONObject(properties);
+                    AppMetr.attachProperties(propertiesObject);
+                } catch (Throwable t) {
+                    Log.error("Error AppMetr.attachProperties JSON: \"" + properties + "\"");
+                }
+            }
+
+            public void AndroidThunkJava_AppMetr_trackSession(String properties) {
+                try {
+                    JSONObject propertiesObject = new JSONObject(properties);
+                    AppMetr.trackSession(propertiesObject);
+                } catch (Throwable t) {
+                    Log.error("Error AppMetr.trackSession JSON: \"" + properties + "\"");
+                }
+            }
+
+            public void AndroidThunkJava_AppMetr_trackEvent(String event, String properties) {
+                try {
+                    JSONObject propertiesObject = new JSONObject(properties);
+                    AppMetr.trackEvent(event, propertiesObject);
+                } catch (Throwable t) {
+                    Log.error("Error AppMetr.trackEvent \"" + event + "\" JSON \"" + properties + "\"");
+                }
+            }
+
+            public void AndroidThunkJava_AppMetr_trackLevel(int level, String properties) {
+                try {
+                    JSONObject propertiesObject = new JSONObject(properties);
+                    AppMetr.trackLevel(level, propertiesObject);
+                } catch (Throwable t) {
+                    Log.error("Error AppMetr.trackLevel \"" + level + "\" JSON \"" + properties + "\"");
+                }
+            }
+
+            public void AndroidThunkJava_AppMetr_trackPayment(String payment) {
+                try {
+                    JSONObject paymentObject = new JSONObject(payment);
+                    AppMetr.trackPayment(paymentObject);
+                } catch (Throwable t) {
+                    Log.error("Error AppMetr.trackPayment JSON \"" + payment + "\"");
+                }
+            }
+
+            public void AndroidThunkJava_AppMetr_trackPayment(String payment, String properties) {
+                try {
+                    JSONObject paymentObject = new JSONObject(payment);
+                    JSONObject propertiesObject = new JSONObject(properties);
+                    AppMetr.trackPayment(paymentObject, propertiesObject);
+                } catch (Throwable t) {
+                    Log.error("Error AppMetr.trackPayment JSON \"" + payment + "\" JSON \"" + properties + "\"");
+                }
+            }
+
+            public void AndroidThunkJava_AppMetr_trackState(String state) {
+                try {
+                    JSONObject stateObject = new JSONObject(state);
+                    AppMetr.trackState(stateObject);
+                } catch (Throwable t) {
+                    Log.error("Error AppMetr.trackState JSON \"" + state + "\"");
+                }
+            }
+        ]]></insert>
+    </gameActivityClassAdditions>
+
+    <!-- optional additions to GameActivity onCreate metadata reading in GameActivity.java -->
+    <gameActivityReadMetadataAdditions>
+        <insert><![CDATA[
+            if (bundle.containsKey("com.epicgames.ue4.AppMetr.AppMetrKey"))
+            {
+                AppMetrKey = bundle.getString("com.epicgames.ue4.AppMetr.AppMetrKey");
+                if (AppMetrKey != null)
+                {
+                    AppMetrKey = AppMetrKey.trim();
+                }
+                Log.debug( "AppMetr Key Loaded \"" + AppMetrKey + "\"" );
+            }
+            else
+            {
+                Log.warn( "Did not find com.epicgames.ue4.AppMetr.AppMetrKey" );
+            }
+        ]]></insert>
+    </gameActivityReadMetadataAdditions>
+
+    <!-- optional additions to GameActivity onCreate in GameActivity.java -->
+    <gameActivityOnCreateAdditions>
+        <insert><![CDATA[
+        //Initialize AppMetr
+        if (AppMetrKey != null && !AppMetrKey.isEmpty()) {
+            try {
+                initializeAppMetr();
+            } catch (Exception e) {
+                Log.error("AppMetr Init Error " + e.getMessage());
+            }
+        } else {
+            Log.warn("AppMetr Key Empty!");
+        }
+        ]]></insert>
+    </gameActivityOnCreateAdditions>
+
+    <!-- optional additions to GameActivity onDestroy in GameActivity.java -->
+    <gameActivityOnDestroyAdditions>
+        <insert><![CDATA[]]></insert>
+    </gameActivityOnDestroyAdditions>
+    <!-- optional additions to GameActivity onStart in GameActivity.java -->
+    <gameActivityOnStartAdditions>
+        <insert><![CDATA[]]></insert>
+    </gameActivityOnStartAdditions>
+    <!-- optional additions to GameActivity onStop in GameActivity.java -->
+    <gameActivityOnStopAdditions>
+        <insert><![CDATA[]]></insert>
+    </gameActivityOnStopAdditions>
+    <!-- optional additions to GameActivity onPause in GameActivity.java -->
+    <gameActivityOnPauseAdditions>
+        <insert><![CDATA[
+        AppMetr.onPause();
+        ]]></insert>
+    </gameActivityOnPauseAdditions>
+    <!-- optional additions to GameActivity onResume in GameActivity.java -->
+    <gameActivityOnResumeAdditions>
+        <insert><![CDATA[
+        AppMetr.onResume();
+        ]]></insert>
+    </gameActivityOnResumeAdditions>
+    <!-- optional additions to GameActivity onNewIntent in GameActivity.java -->
+    <gameActivityOnNewIntentAdditions>
+        <insert><![CDATA[]]></insert>
+    </gameActivityOnNewIntentAdditions>
+    <!-- optional additions to GameActivity onActivityResult in GameActivity.java -->
+    <gameActivityOnActivityResultAdditions>
+        <insert><![CDATA[]]></insert>
+    </gameActivityOnActivityResultAdditions>
+</root>
