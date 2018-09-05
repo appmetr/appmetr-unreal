@@ -32,7 +32,7 @@
 
     <!-- optional files or directories to copy to Intermediate/Android/APK -->
     <resourceCopies>
-        <copyFile src="$S(PluginDir)/../../Build/Android/libs/appmetr-android-1.9.21.jar" dst="$S(BuildDir)/libs/appmetr-android-1.9.21.jar" />
+        <copyFile src="$S(PluginDir)/../../Build/Android/libs/appmetr-android-1.10.0.jar" dst="$S(BuildDir)/libs/appmetr-android-1.10.0.jar" />
     </resourceCopies>
 
     <!-- optional additions to the GameActivity imports in GameActivity.java -->
