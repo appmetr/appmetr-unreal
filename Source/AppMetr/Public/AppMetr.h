@@ -18,16 +18,12 @@ public:
 	static void trackEvent(FString event);
 	static void trackEvent(FString event, FString properties);
 
-	static void trackLevel(int level);
-	static void trackLevel(int level, FString properties);
-
 	static void trackPayment(FString payment);
 	static void trackPayment(FString payment, FString properties);
 
 	static void flush();
 	static void flushLocal();
 
-	static void trackInstallURL(FString url);
 
 	static void trackState(FString state);
 
