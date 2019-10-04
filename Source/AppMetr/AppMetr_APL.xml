@@ -18,7 +18,6 @@
         <addPermission android:name="android.permission.INTERNET"/>
         <addPermission android:name="android.permission.ACCESS_WIFI_STATE"/>
         <addPermission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-        <addPermission android:name="android.permission.READ_PHONE_STATE"/>
     </androidManifestUpdates>
 
     <!-- optional additions to proguard -->
@@ -80,15 +79,6 @@ import java.util.zip.DataFormatException;
                     AppMetr.trackEvent(event, propertiesObject);
                 } catch (Throwable t) {
                     Log.error("Error AppMetr.trackEvent \"" + event + "\" JSON \"" + properties + "\"");
-                }
-            }
-
-            public void AndroidThunkJava_AppMetr_trackLevel(int level, String properties) {
-                try {
-                    JSONObject propertiesObject = new JSONObject(properties);
-                    AppMetr.trackLevel(level, propertiesObject);
-                } catch (Throwable t) {
-                    Log.error("Error AppMetr.trackLevel \"" + level + "\" JSON \"" + properties + "\"");
                 }
             }
 

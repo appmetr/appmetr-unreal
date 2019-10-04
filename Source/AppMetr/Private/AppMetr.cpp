@@ -135,47 +135,6 @@ void UAppMetr::trackEvent(FString event, FString properties) {
 #endif
 }
 
-void UAppMetr::trackLevel(int level) {
-#if PLATFORM_ANDROID
-	JNIEnv *Env = FAndroidApplication::GetJavaEnv();
-	jclass jClass = FAndroidApplication::FindJavaClass(APPMETR_CLASS_NAME);
-
-	if (jClass) {
-		const char *strMethod = "trackLevel";
-		jmethodID jMethod = Env->GetStaticMethodID(jClass, strMethod, "(I)V");
-
-		if (jMethod) {
-			Env->CallStaticVoidMethod(jClass, jMethod, (jint)level);
-			__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "AppMetr Method Call Successful %s", strMethod);
-		} else {
-			__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to find method %s", strMethod);
-		}
-
-		Env->DeleteLocalRef(jClass);
-	} else {
-		__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to find class %s", APPMETR_CLASS_NAME);
-	}
-#endif
-}
-
-void UAppMetr::trackLevel(int level, FString properties) {
-#if PLATFORM_ANDROID
-	JNIEnv *Env = FAndroidApplication::GetJavaEnv();
-
-	const char *strMethod = "AndroidThunkJava_AppMetr_trackLevel";
-	jmethodID jMethod = Env->GetMethodID(FJavaWrapper::GameActivityClassID, strMethod, "(ILjava/lang/String;)V");
-
-	if (jMethod) {
-		jint levelArg = (jint) level;
-		jstring propertiesArg = Env->NewStringUTF(TCHAR_TO_UTF8(*properties));
-
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, jMethod, levelArg, propertiesArg);
-	} else {
-		__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to find method %s", strMethod);
-	}
-#endif
-}
-
 void UAppMetr::trackPayment(FString payment) {
 #if PLATFORM_ANDROID
 	JNIEnv *Env = FAndroidApplication::GetJavaEnv();
@@ -245,32 +204,6 @@ void UAppMetr::flushLocal() {
 
 		if (jMethod) {
 			Env->CallStaticVoidMethod(jClass, jMethod);
-			__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "AppMetr Method Call Successful %s", strMethod);
-		} else {
-			__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to find method %s", strMethod);
-		}
-
-		Env->DeleteLocalRef(jClass);
-	} else {
-		__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to find class %s", APPMETR_CLASS_NAME);
-	}
-#endif
-}
-
-void UAppMetr::trackInstallURL(FString url) {
-#if PLATFORM_ANDROID
-	JNIEnv *Env = FAndroidApplication::GetJavaEnv();
-	jclass jClass = FAndroidApplication::FindJavaClass(APPMETR_CLASS_NAME);
-
-	if (jClass) {
-		const char *strMethod = "trackInstallURL";
-
-		jmethodID jMethod = Env->GetStaticMethodID(jClass, strMethod, "(Ljava/lang/String;)V");
-
-		if (jMethod) {
-			jstring urlArg = Env->NewStringUTF(TCHAR_TO_UTF8(*url));
-
-			Env->CallStaticVoidMethod(jClass, jMethod, urlArg);
 			__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "AppMetr Method Call Successful %s", strMethod);
 		} else {
 			__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to find method %s", strMethod);
